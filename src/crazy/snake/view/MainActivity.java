@@ -11,7 +11,6 @@ import crazy.snake.controller.CrazySnakeServer;
 import crazy.snake.controller.DataHelper;
 import crazy.snake.exceptions.UserNameAlreadyExistException;
 import crazy.snake.model.Player;
-import java.awt.Color;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Level;
