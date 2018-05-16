@@ -42,6 +42,8 @@ public class CrazySnakeClient {
             bw.write(CrazySnakeServer.MSG_CONNECT + "|" + player.getUserName());
             bw.newLine();
             bw.flush();
+            String receivedMessage = br.readLine();
+            System.out.println("Received : " + receivedMessage);
             //bw.close();
         } catch (IOException ex) {
             Logger.getLogger(CrazySnakeClient.class.getName()).log(Level.SEVERE, null, ex);
