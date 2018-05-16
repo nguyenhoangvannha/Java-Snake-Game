@@ -306,8 +306,10 @@ public class MainActivity extends javax.swing.JFrame {
         // TODO add your handling code here:
         if (player == null || player.getUserName().equals("")) {
             DialogUtils.showWarning(this, "Attention", "Your have to connect to a server first");
+            btnConnect.requestFocus();
         } else {
             int roomID = client.createNewRoom(player);
+            player.setRoomID(roomID);
             System.out.println("ROOM ID" + roomID);
             RoomActivity roomActivity = new RoomActivity(this, true, roomID, player);
             roomActivity.setVisible(true);
@@ -330,6 +332,7 @@ public class MainActivity extends javax.swing.JFrame {
                     }
                     onlineListModel.addElement(p);
                 }
+                player.setCrazySnakeClient(client);
             } catch (IOException ex) {
                 DialogUtils.showWarning(this, "Error", "Cannot connect to server\n" + ex.toString());
                 btnConnect.setEnabled(true);
@@ -358,14 +361,29 @@ public class MainActivity extends javax.swing.JFrame {
         // TODO add your handling code here:
         if (player == null || player.getUserName().equals("")) {
             DialogUtils.showWarning(this, "Attention", "Your have to connect to a server first");
+            btnConnect.requestFocus();
         } else {
-            int roomID = client.createNewRoom(player);
-            System.out.println("ROOM ID" + roomID);
-            RoomActivity roomActivity = new RoomActivity(this, true, roomID, player);
-            roomActivity.setVisible(true);
+            if(validateRoomID()){
+                int roomID = client.createNewRoom(player);
+                System.out.println("ROOM ID" + roomID);
+                RoomActivity roomActivity = new RoomActivity(this, true, roomID, player);
+                roomActivity.setVisible(true);
+            }
         }
     }//GEN-LAST:event_btnJoinRoomActionPerformed
 
+    private boolean validateRoomID(){
+        try{
+            int roomID = Integer.parseInt(txtRoomID.getText().trim());
+            player.setRoomID(roomID);
+            return true;
+        } catch(Exception e){
+            DialogUtils.showWarning(this, "Error", "Room ID is A NUMBER");
+            txtRoomID.requestFocus();
+            return false;
+        }
+    }
+    
     /**
      * @param args the command line arguments
      */

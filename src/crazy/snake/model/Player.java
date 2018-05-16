@@ -5,6 +5,7 @@
  */
 package crazy.snake.model;
 
+import crazy.snake.controller.CrazySnakeClient;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.net.Socket;
@@ -21,6 +22,7 @@ public class Player {
     BufferedWriter bw;
     BufferedReader br;
     int roomID;
+    CrazySnakeClient crazySnakeClient;
 
     public Player() {
         userName = "nhvn";
@@ -34,6 +36,22 @@ public class Player {
         this.server = server;
         this.port = port;
         this.socket = socket;
+    }
+
+    public int getRoomID() {
+        return roomID;
+    }
+
+    public void setRoomID(int roomID) {
+        this.roomID = roomID;
+    }
+
+    public CrazySnakeClient getCrazySnakeClient() {
+        return crazySnakeClient;
+    }
+
+    public void setCrazySnakeClient(CrazySnakeClient crazySnakeClient) {
+        this.crazySnakeClient = crazySnakeClient;
     }
 
     public BufferedWriter getBw() {

@@ -111,103 +111,113 @@ public class CrazySnakeServer {
                 System.out.println("Waiting for client");
                 Socket s = ss.accept();
                 clientCount++;
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        boolean run = true;
-                        System.out.println(clientCount + " | Client connected " + s.getPort());
-                        InputStream is;
-                        try {
-                            is = s.getInputStream();
-                            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-
-                            OutputStream os = s.getOutputStream();
-                            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
-
-                            String receivedMessage;
-
-                            do {
-                                receivedMessage = br.readLine();
-                                String userName = "";
-                                try {
-                                    if (receivedMessage != null) {
-                                        System.out.println("Received : " + receivedMessage);
-                                        if (receivedMessage.contains(MSG_CONNECT)) {
-                                            userName = receivedMessage.substring(receivedMessage.indexOf("|") + 1);
-                                            receivedMessage = MSG_CONNECT;
-                                        }
-                                        if (receivedMessage.contains(MSG_DISCONNECT)) {
-                                            userName = receivedMessage.substring(receivedMessage.indexOf("|") + 1);
-                                            receivedMessage = MSG_DISCONNECT;
-                                        }
-                                        if (receivedMessage.contains(MSG_GENERATE_ROOM_ID)) {
-                                            userName = receivedMessage.substring(receivedMessage.indexOf("|") + 1);
-                                            receivedMessage = MSG_GENERATE_ROOM_ID;
-                                        }
-                                    }
-                                } catch (Exception eb) {
-
-                                }
-                                if (receivedMessage != null) {
-                                    switch (receivedMessage) {
-                                        case MSG_CONNECT:
-                                            if (players.contains(userName)) {
-                                                System.out.println("MSG_CONNECT Error: Username are already exist!" + players.toString());
-                                                bw.write(MSG_ERROR);
-                                                bw.newLine();
-                                                bw.flush();
-                                            } else {
-                                                players.add(userName);
-                                                System.out.println("Connected player: " + players.toString());
-                                                bw.write(players.toString());
-                                                bw.newLine();
-                                                bw.flush();
-                                            }
-                                            break;
-                                        case MSG_DISCONNECT:
-                                            if (!players.contains(userName)) {
-                                                System.out.println("MSG_DISCONNECT Error: Username NOT FOUND!" + players.toString());
-                                                bw.write(MSG_ERROR);
-                                                bw.newLine();
-                                                bw.flush();
-                                            } else {
-                                                players.remove(userName);
-                                                System.out.println("Removed player: " + userName);
-                                                bw.write("Removed " + userName);
-                                                bw.newLine();
-                                                bw.flush();
-                                                run = false;
-                                            }
-                                            break;
-                                        case MSG_GENERATE_ROOM_ID:
-                                            int newRoomID = createNewRoomID();
-                                            bw.write(newRoomID + "");
-                                            bw.newLine();
-                                            bw.flush();
-                                            ArrayList<String> members = new ArrayList<>();
-                                            members.add(userName);
-                                            rooms.put(newRoomID, members);
-                                            roomsAdmin.put(newRoomID, userName);
-                                            break;
-                                        case QUIT:
-                                            System.out.println("Client has left !");
-                                            bw.close();
-                                            br.close();
-                                            run = false;
-                                            return;
-                                    }
-                                }
-                            } while (run);
-                            s.close();
-                        } catch (IOException ex) {
-                            Logger.getLogger(CrazySnakeServer.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-                });
-                thread.start();
+                ClientThread clienThread = new ClientThread(s);
+                clienThread.start();
             } while (true);
         } catch (IOException ex) {
             System.out.println("Eror: " + ex.toString());
+        }
+    }
+
+    static class ClientThread extends Thread {
+
+        Socket s;
+
+        public ClientThread(Socket s) {
+            this.s = s;
+        }
+
+        @Override
+        public void run() {
+            super.run(); //To change body of generated methods, choose Tools | Templates.
+            boolean run = true;
+            System.out.println(clientCount + " | Client connected " + s.getPort());
+            InputStream is;
+            try {
+                is = s.getInputStream();
+                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+
+                OutputStream os = s.getOutputStream();
+                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
+
+                String receivedMessage;
+
+                do {
+                    receivedMessage = br.readLine();
+                    String userName = "";
+                    try {
+                        if (receivedMessage != null) {
+                            System.out.println("Received : " + receivedMessage);
+                            if (receivedMessage.contains(CrazySnakeServer.MSG_CONNECT)) {
+                                userName = receivedMessage.substring(receivedMessage.indexOf("|") + 1);
+                                receivedMessage = CrazySnakeServer.MSG_CONNECT;
+                            }
+                            if (receivedMessage.contains(CrazySnakeServer.MSG_DISCONNECT)) {
+                                userName = receivedMessage.substring(receivedMessage.indexOf("|") + 1);
+                                receivedMessage = CrazySnakeServer.MSG_DISCONNECT;
+                            }
+                            if (receivedMessage.contains(CrazySnakeServer.MSG_GENERATE_ROOM_ID)) {
+                                userName = receivedMessage.substring(receivedMessage.indexOf("|") + 1);
+                                receivedMessage = CrazySnakeServer.MSG_GENERATE_ROOM_ID;
+                            }
+                        }
+                    } catch (Exception eb) {
+
+                    }
+                    if (receivedMessage != null) {
+                        switch (receivedMessage) {
+                            case CrazySnakeServer.MSG_CONNECT:
+                                if (players.contains(userName)) {
+                                    System.out.println("CrazySnakeServer.MSG_CONNECT Error: Username are already exist!" + players.toString());
+                                    bw.write(CrazySnakeServer.MSG_ERROR);
+                                    bw.newLine();
+                                    bw.flush();
+                                } else {
+                                    players.add(userName);
+                                    System.out.println("Connected player: " + players.toString());
+                                    bw.write(players.toString());
+                                    bw.newLine();
+                                    bw.flush();
+                                }
+                                break;
+                            case CrazySnakeServer.MSG_DISCONNECT:
+                                if (!players.contains(userName)) {
+                                    System.out.println("CrazySnakeServer.MSG_DISCONNECT Error: Username NOT FOUND!" + players.toString());
+                                    bw.write(CrazySnakeServer.MSG_ERROR);
+                                    bw.newLine();
+                                    bw.flush();
+                                } else {
+                                    players.remove(userName);
+                                    System.out.println("Removed player: " + userName);
+                                    bw.write("Removed " + userName);
+                                    bw.newLine();
+                                    bw.flush();
+                                    run = false;
+                                }
+                                break;
+                            case CrazySnakeServer.MSG_GENERATE_ROOM_ID:
+                                int newRoomID = createNewRoomID();
+                                bw.write(newRoomID + "");
+                                bw.newLine();
+                                bw.flush();
+                                ArrayList<String> members = new ArrayList<>();
+                                members.add(userName);
+                                rooms.put(newRoomID, members);
+                                roomsAdmin.put(newRoomID, userName);
+                                break;
+                            case QUIT:
+                                System.out.println("Client has left !");
+                                bw.close();
+                                br.close();
+                                run = false;
+                                return;
+                        }
+                    }
+                } while (run);
+                s.close();
+            } catch (IOException ex) {
+                Logger.getLogger(CrazySnakeServer.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }
