@@ -27,7 +27,8 @@ import java.util.logging.Logger;
 public class CrazySnakeServer {
 
     static int clientCount = 0;
-    static HashMap<Integer, Socket> rooms = new HashMap<>();
+    static HashMap<Integer, ArrayList<String>> rooms = new HashMap<>();
+    static HashMap<Integer, String> roomsAdmin = new HashMap<>();
     static ArrayList<String> players = new ArrayList<String>();
     public static final String MSG_GENERATE_ROOM_ID = "MSG_GENERATE_ROOM_ID";
     public static final String QUIT = "QUIT";
@@ -82,6 +83,10 @@ public class CrazySnakeServer {
                                         userName = receivedMessage.substring(receivedMessage.indexOf("|") + 1);
                                         receivedMessage = MSG_CONNECT;
                                     }
+                                    if(receivedMessage.contains(MSG_GENERATE_ROOM_ID)){
+                                        userName = receivedMessage.substring(receivedMessage.indexOf("|") + 1);
+                                        receivedMessage = MSG_GENERATE_ROOM_ID;
+                                    }
                                 } catch(Exception eb){
                                     
                                 }
@@ -96,6 +101,10 @@ public class CrazySnakeServer {
                                         bw.write(newRoomID + "");
                                         bw.newLine();
                                         bw.flush();
+                                        ArrayList<String> members = new ArrayList<>();
+                                        members.add(userName);
+                                        rooms.put(newRoomID, members);
+                                        roomsAdmin.put(newRoomID, userName);
                                         break;
                                     case QUIT:
                                         System.out.println("Client has left !");
