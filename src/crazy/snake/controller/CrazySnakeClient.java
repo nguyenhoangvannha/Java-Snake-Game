@@ -36,16 +36,16 @@ public class CrazySnakeClient {
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             OutputStream os = s.getOutputStream();
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
-            
+
             player.setBr(br);
             player.setBw(bw);
-            
+
             bw.write(CrazySnakeServer.MSG_CONNECT + "|" + player.getUserName());
             bw.newLine();
             bw.flush();
             String receivedMessage = br.readLine();
             player.setSocket(s);
-            if(receivedMessage.contains(CrazySnakeServer.MSG_ERROR)){
+            if (receivedMessage.contains(CrazySnakeServer.MSG_ERROR)) {
                 throw new UserNameAlreadyExistException();
             } else {
                 System.out.println("Received : " + receivedMessage);
@@ -57,10 +57,11 @@ public class CrazySnakeClient {
             //bw.close();
         } catch (IOException ex) {
         }
-        
+
         return null;
     }
-    public void disConnect(Player player){
+
+    public void disConnect(Player player) {
         try {
             BufferedReader br = player.getBr();
             BufferedWriter bw = player.getBw();
@@ -68,7 +69,7 @@ public class CrazySnakeClient {
             bw.newLine();
             bw.flush();
             String receivedMessage = br.readLine();
-            if(receivedMessage.contains(CrazySnakeServer.MSG_ERROR)){
+            if (receivedMessage.contains(CrazySnakeServer.MSG_ERROR)) {
                 System.out.println(CrazySnakeServer.MSG_ERROR);
             } else {
                 System.out.println("Received : " + receivedMessage);
@@ -79,15 +80,9 @@ public class CrazySnakeClient {
     }
 
     public int createNewRoom(Player player) {
-        //Socket s = player.getSocket();
         try {
-            //InputStream is = s.getInputStream();
-            //BufferedReader br = new BufferedReader(new InputStreamReader(is));
             BufferedReader br = player.getBr();
-
-//            OutputStream os = s.getOutputStream();
-//            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
-              BufferedWriter bw = player.getBw();
+            BufferedWriter bw = player.getBw();
 
             String receivedMessage;
             System.out.println("Talking to Server");
@@ -96,10 +91,10 @@ public class CrazySnakeClient {
             bw.flush();
             receivedMessage = br.readLine();
             System.out.println("Received : " + receivedMessage);
-            try{
+            try {
                 int result = Integer.parseInt(receivedMessage);
                 return result;
-            } catch(Exception e){
+            } catch (Exception e) {
             }
             //bw.close();
             //br.close();

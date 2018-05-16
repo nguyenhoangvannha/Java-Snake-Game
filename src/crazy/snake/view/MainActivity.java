@@ -10,6 +10,7 @@ import crazy.snake.controller.CrazySnakeClient;
 import crazy.snake.controller.DataHelper;
 import crazy.snake.exceptions.UserNameAlreadyExistException;
 import crazy.snake.model.Player;
+import java.awt.Color;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -33,7 +34,8 @@ public class MainActivity extends javax.swing.JFrame {
      */
     public MainActivity() {
         try {
-            UIManager.setLookAndFeel("com.bulenkov.darcula.DarculaLaf");
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            //UIManager.setLookAndFeel("com.bulenkov.darcula.DarculaLaf");
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
@@ -190,16 +192,20 @@ public class MainActivity extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         btnNewRom.setText("New Room");
+        btnNewRom.setBorder(null);
         btnNewRom.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnNewRomActionPerformed(evt);
             }
         });
+
+        pnJoinRoom.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 255)));
+        pnJoinRoom.setForeground(new java.awt.Color(204, 204, 204));
 
         jLabel5.setText("Room ID");
 
@@ -217,7 +223,7 @@ public class MainActivity extends javax.swing.JFrame {
             .addGroup(pnJoinRoomLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnJoinRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnJoinRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnJoinRoom, javax.swing.GroupLayout.DEFAULT_SIZE, 332, Short.MAX_VALUE)
                     .addGroup(pnJoinRoomLayout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -243,16 +249,16 @@ public class MainActivity extends javax.swing.JFrame {
             .addGroup(pnJoinGameLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnJoinGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(pnJoinRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnJoinRoom, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnNewRom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         pnJoinGameLayout.setVerticalGroup(
             pnJoinGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnJoinGameLayout.createSequentialGroup()
-                .addGap(27, 27, 27)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnNewRom, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addComponent(pnJoinRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -399,8 +405,17 @@ public class MainActivity extends javax.swing.JFrame {
         this.setIconImage(DataHelper.loadIcon());
         this.setLocationRelativeTo(null);
         this.getContentPane().setBackground(ColorHelper.bgColor);
-        pnJoinRoom.setBackground(ColorHelper.bgColor);
-        lstOnline.setBackground(ColorHelper.bgColor);
+        txtServer.setText(CrazySnakeClient.server);
+        txtPort.setText(CrazySnakeClient.port + "");
+        onlineListModel = new DefaultListModel<>();
+        lstOnline.setModel(onlineListModel);
+    }
+    private void customizeUIDracula() {
+        this.setIconImage(DataHelper.loadIcon());
+        this.setLocationRelativeTo(null);
+        this.getContentPane().setBackground(ColorHelper.bgColorDracula);
+        pnJoinRoom.setBackground(ColorHelper.bgColorDracula);
+        lstOnline.setBackground(ColorHelper.bgColorDracula);
         txtServer.setText(CrazySnakeClient.server);
         txtPort.setText(CrazySnakeClient.port + "");
         onlineListModel = new DefaultListModel<>();
