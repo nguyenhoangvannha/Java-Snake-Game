@@ -306,7 +306,7 @@ public class MainActivity extends javax.swing.JFrame {
                 client.connect(player);
                 lblStatus.setText("Connected to " + player.getServer() + ":" + player.getPort());
             } catch (IOException ex) {
-                DialogUtils.showWarning(this, "Error", "Cannot connect to server:" + ex.toString());
+                DialogUtils.showWarning(this, "Error", "Cannot connect to server\n" + ex.toString());
                 btnConnect.setEnabled(true);
             }
         } else {
@@ -316,23 +316,15 @@ public class MainActivity extends javax.swing.JFrame {
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
-        if(player.getUserName() != null && !player.getUserName().equals("")){
             try {
                 player.getBr().close();
-            } catch (IOException ex) {
-                Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            try {
                 player.getBw().close();
-            } catch (IOException ex) {
-                Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            try {
                 player.getSocket().close();
-            } catch (IOException ex) {
+            } catch (Exception ex) {
+                System.exit(0);
                 Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
+        System.exit(0);
     }//GEN-LAST:event_formWindowClosing
 
     /**
