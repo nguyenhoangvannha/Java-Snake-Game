@@ -54,9 +54,7 @@ public class CrazySnakeClient {
                 throw new UserNameAlreadyExistException();
             } else {
                 System.out.println("Received : " + receivedMessage);
-                receivedMessage = receivedMessage.replace("[", "");
-                receivedMessage = receivedMessage.replace("]", "");
-                String[] players = receivedMessage.split(",");
+                String[] players = getMemberArray(receivedMessage);
                 return players;
             }
         } catch (IOException ex) {
@@ -64,6 +62,8 @@ public class CrazySnakeClient {
         return null;
     }
 
+    
+    
     public void disConnect(Player player) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(player.getIs()));
@@ -106,6 +106,26 @@ public class CrazySnakeClient {
         
         return -1;
     }
+    private String[] getMemberArray(String strmembers){
+        strmembers = strmembers.replace("[", "");            
+            strmembers = strmembers.replace("]", "");
+            String[] arrMembers = strmembers.split(",");
+            for(String member: arrMembers){
+                member = member.trim();
+            }
+            return arrMembers;
+    }
+    private ArrayList<String> getMemberList(String strmembers){
+        strmembers = strmembers.replace("[", "");            
+            strmembers = strmembers.replace("]", "");
+            String[] arrMembers = strmembers.split(",");
+            ArrayList<String> members = new ArrayList<>();
+            for(String member: arrMembers){
+                member = member.trim();
+                members.add(member);
+            }
+            return members;
+    }
     public Pair<String, ArrayList<String>> getRoomInfo(Player player) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(player.getIs()));
@@ -118,14 +138,7 @@ public class CrazySnakeClient {
             System.out.println("RoomAdmin : " + roomAdmin);
             String strmembers = br.readLine();
             System.out.println("Members:" + strmembers);
-            ArrayList<String> members = new ArrayList<>();
-            strmembers = strmembers.replace("[", "");            
-            strmembers = strmembers.replace("]", "");
-            String[] arrMembers = strmembers.split(",");
-            for(String member: arrMembers){
-                member = member.trim();
-                members.add(member);
-            }
+            ArrayList<String> members = getMemberList(strmembers);
             Pair p = new Pair(roomAdmin, members);
             return p;
         } catch (IOException ex) {
