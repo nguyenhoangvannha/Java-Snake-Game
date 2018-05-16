@@ -25,7 +25,7 @@ public class RoomActivity extends javax.swing.JDialog {
     int[] arrayRefVar = {1, 2, 3};
     ArrayList<JLabel> labelsName;
     ArrayList<JLabel> labelsOwner;
-
+Thread refrestUI;
     /**
      * Creates new form RoomActivity
      */
@@ -36,16 +36,21 @@ public class RoomActivity extends javax.swing.JDialog {
         room.setID(roomID);
         room.setPlaying(false);
         this.player = player;
-        Thread thread = new Thread(new Runnable() {
+        refrestUI = new Thread(new Runnable() {
             @Override
             public void run() {
                 do{
                     getRoomInfo();
                     update();
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(RoomActivity.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 } while(!room.isPlaying());
             }
         });
-        thread.start();
+        refrestUI.start();
     }
 
     /**
@@ -84,6 +89,11 @@ public class RoomActivity extends javax.swing.JDialog {
         btnStartGame = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         pnPlayer1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         pnPlayer1.setForeground(new java.awt.Color(153, 255, 204));
@@ -389,6 +399,15 @@ public class RoomActivity extends javax.swing.JDialog {
             thread.start();
         }
     }//GEN-LAST:event_btnStartGameActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        refrestUI.stop();
+        leaveRoom();
+    }//GEN-LAST:event_formWindowClosing
+    private void leaveRoom() {
+        player.getCrazySnakeClient().leaveRoom(room.getID(), player);
+    }
     void startGame() {
         System.out.println("Start Game");
     }
@@ -469,5 +488,13 @@ public class RoomActivity extends javax.swing.JDialog {
             }
             i++;
         }
+        if(i < 3){
+            for(int j = i; j < 4; j++){
+                labelsName.get(j).setText("?");
+                labelsOwner.get(j).setText("");
+            }
+        }
     }
+
+    
 }

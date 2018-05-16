@@ -28,7 +28,8 @@ public class MainActivity extends javax.swing.JFrame {
     CrazySnakeClient client;
     Player player;
     DefaultListModel<String> onlineListModel;
-
+    boolean isConnected = false;
+    Thread refreshOnline;
     /**
      * Creates new form MainActivity
      */
@@ -306,8 +307,10 @@ public class MainActivity extends javax.swing.JFrame {
             int roomID = client.createNewRoom(player);
             player.setRoomID(roomID);
             System.out.println("ROOM ID" + roomID);
+            refreshOnline.suspend();
             RoomActivity roomActivity = new RoomActivity(this, true, roomID, player);
             roomActivity.setVisible(true);
+            refreshOnline.resume();
         }
     }//GEN-LAST:event_btnNewRomActionPerformed
 
@@ -318,24 +321,47 @@ public class MainActivity extends javax.swing.JFrame {
             client = new CrazySnakeClient();
             try {
                 String[] onlinePlayers = client.connect(player);
+                isConnected = true;
                 lblStatus.setText("Connected to " + player.getServer() + ":" + player.getPort());
                 System.out.println("Online list" + Arrays.toString(onlinePlayers));
-                for(String p: onlinePlayers){
-                    p = p.trim();
-                    if(p.equals(player.getUserName())){
-                        p += " (you)";
-                    }
-                    onlineListModel.addElement(p);
-                }
+
                 player.setCrazySnakeClient(client);
+
+                refreshOnline = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        do {
+                            onlineListModel.removeAllElements();
+                            String[] onlinePlayers = client.getPlayers(player);
+                            System.out.println(Arrays.toString(onlinePlayers));
+                            if(onlinePlayers != null)
+                            for (String p : onlinePlayers) {
+                                p = p.trim();
+                                if (p.equals(player.getUserName())) {
+                                    p += " (you)";
+                                }
+                                onlineListModel.addElement(p);
+                            }
+                            try {
+                                Thread.sleep(2000);
+                            } catch (InterruptedException ex) {
+                                Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        } while (isConnected);
+                    }
+                });
+                refreshOnline.start();
             } catch (IOException ex) {
+                isConnected = false;
                 DialogUtils.showWarning(this, "Error", "Cannot connect to server\n" + ex.toString());
                 btnConnect.setEnabled(true);
             } catch (UserNameAlreadyExistException ex) {
+                isConnected = false;
                 DialogUtils.showWarning(this, "Error", "Username are alredy exist\n" + ex.toString());
                 btnConnect.setEnabled(true);
             }
         } else {
+            isConnected = false;
             btnConnect.setEnabled(true);
         }
     }//GEN-LAST:event_btnConnectActionPerformed
@@ -344,7 +370,7 @@ public class MainActivity extends javax.swing.JFrame {
         // TODO add your handling code here:
         try {
             client.disConnect(player);
-            
+
             player.getSocket().close();
         } catch (Exception ex) {
         }
@@ -357,32 +383,34 @@ public class MainActivity extends javax.swing.JFrame {
             DialogUtils.showWarning(this, "Attention", "Your have to connect to a server first");
             btnConnect.requestFocus();
         } else {
-            if(validateRoomID()){
+            if (validateRoomID()) {
                 String msg = client.joinRoom(player);
                 System.out.println("Result " + msg);
-                if(msg.contains(CrazySnakeServer.MSG_ERROR)){
+                if (msg.contains(CrazySnakeServer.MSG_ERROR)) {
                     DialogUtils.showWarning(this, "Attention", msg);
                     btnJoinRoom.requestFocus();
                 } else {
+                    refreshOnline.suspend();
                     RoomActivity roomActivity = new RoomActivity(this, true, player.getRoomID(), player);
                     roomActivity.setVisible(true);
+                    refreshOnline.resume();
                 }
             }
         }
     }//GEN-LAST:event_btnJoinRoomActionPerformed
 
-    private boolean validateRoomID(){
-        try{
+    private boolean validateRoomID() {
+        try {
             int roomID = Integer.parseInt(txtRoomID.getText().trim());
             player.setRoomID(roomID);
             return true;
-        } catch(Exception e){
+        } catch (Exception e) {
             DialogUtils.showWarning(this, "Error", "Room ID is A NUMBER");
             txtRoomID.requestFocus();
             return false;
         }
     }
-    
+
     /**
      * @param args the command line arguments
      */
@@ -427,6 +455,7 @@ public class MainActivity extends javax.swing.JFrame {
         onlineListModel = new DefaultListModel<>();
         lstOnline.setModel(onlineListModel);
     }
+
     private void customizeUIDracula() {
         this.setIconImage(DataHelper.loadIcon());
         this.setLocationRelativeTo(null);

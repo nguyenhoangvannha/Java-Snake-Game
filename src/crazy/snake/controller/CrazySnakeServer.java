@@ -31,11 +31,13 @@ public class CrazySnakeServer {
     public static final String MSG_GENERATE_ROOM_ID = "MSG_GENERATE_ROOM_ID";
     public static final String MSG_JOIN_ROOM = "MSG_JOIN_ROOM";
     public static final String MSG_GET_ROOM_INFO = "MSG_GET_ROOM_INFO";
+    public static final String MSG_GET_PLAYERS = "MSG_GET_PLAYERS";
     public static final String QUIT = "QUIT";
     public static final String MSG_CONNECT = "MSG_CONNECT";
     public static final String MSG_DISCONNECT = "MSG_DISCONNECT";
     public static final String MSG_ERROR = "MSG_ERROR";
     public static final String MSG_SUCCESS = "MSG_SUCCESS";
+    public static final String MSG_LEAVE_ROOM = "MSG_LEAVE_ROOM";
 
     static int clientCount = 0;
     static HashMap<Integer, ArrayList<String>> rooms = new HashMap<>();
@@ -92,7 +94,19 @@ public class CrazySnakeServer {
         }
         return sb.toString();
     }
-
+    static void leaveRoom(int roomID, String userName){
+        if(roomsAdmin.get(roomID).equals(userName) &&  rooms.get(roomID).size() > 1){
+            rooms.get(roomID).remove(userName);
+            roomsAdmin.replace(roomID, rooms.get(roomID).get(0));
+        }
+        if(rooms.get(roomID).size() < 1){
+            rooms.remove(roomID);
+            roomsAdmin.remove(roomID);
+        } else {
+            rooms.get(roomID).remove(userName);
+        }
+        
+    }
     /**
      * @param args the command line arguments
      */
@@ -189,6 +203,15 @@ public class CrazySnakeServer {
                                 userName = strs[2];
                                 receivedMessage = CrazySnakeServer.MSG_JOIN_ROOM;
                             }
+                            if (receivedMessage.contains(CrazySnakeServer.MSG_LEAVE_ROOM)) {
+                                String[] strs = receivedMessage.split("\\|");
+                                try {
+                                    roomID = Integer.parseInt(strs[1].trim());
+                                } catch (Exception ebc) {
+                                }
+                                userName = strs[2];
+                                receivedMessage = CrazySnakeServer.MSG_LEAVE_ROOM;
+                            }
                             if (receivedMessage.contains(CrazySnakeServer.MSG_GET_ROOM_INFO)) {
                                 try {
                                     roomID = Integer.parseInt(receivedMessage.substring(receivedMessage.indexOf("|") + 1));
@@ -245,6 +268,14 @@ public class CrazySnakeServer {
                                 bw.write(roomsAdmin.get(roomID));
                                 bw.newLine();
                                 bw.write(rooms.get(roomID).toString());
+                                bw.newLine();
+                                bw.flush();
+                                break;
+                            case CrazySnakeServer.MSG_LEAVE_ROOM:
+                                leaveRoom(roomID, userName);
+                                break;
+                            case CrazySnakeServer.MSG_GET_PLAYERS:
+                                bw.write(players.toString());
                                 bw.newLine();
                                 bw.flush();
                                 break;
