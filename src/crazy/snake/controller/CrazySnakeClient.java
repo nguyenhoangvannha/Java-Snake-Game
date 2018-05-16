@@ -96,8 +96,28 @@ public class CrazySnakeClient {
                 return result;
             } catch (Exception e) {
             }
-            //bw.close();
-            //br.close();
+        } catch (IOException ex) {
+            Logger.getLogger(CrazySnakeClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return -1;
+    }
+    public int getRoomInfo(Player player) {
+        try {
+            BufferedReader br = player.getBr();
+            BufferedWriter bw = player.getBw();
+
+            String receivedMessage;
+            System.out.println("Talking to Server");
+            bw.write(CrazySnakeServer.MSG_GENERATE_ROOM_ID + "|" + player.getUserName());
+            bw.newLine();
+            bw.flush();
+            receivedMessage = br.readLine();
+            System.out.println("Received : " + receivedMessage);
+            try {
+                int result = Integer.parseInt(receivedMessage);
+                return result;
+            } catch (Exception e) {
+            }
         } catch (IOException ex) {
             Logger.getLogger(CrazySnakeClient.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -115,8 +135,6 @@ public class CrazySnakeClient {
             bw.flush();
             receivedMessage = br.readLine();
             return receivedMessage;
-            //bw.close();
-            //br.close();
         } catch (IOException ex) {
             Logger.getLogger(CrazySnakeClient.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -139,8 +157,6 @@ public class CrazySnakeClient {
                 return result;
             } catch (Exception e) {
             }
-            //bw.close();
-            //br.close();
         } catch (IOException ex) {
             Logger.getLogger(CrazySnakeClient.class.getName()).log(Level.SEVERE, null, ex);
         }

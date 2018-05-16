@@ -8,6 +8,8 @@ package crazy.snake.model;
 import crazy.snake.controller.CrazySnakeClient;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 
 /**
@@ -19,6 +21,8 @@ public class Player {
     String server;
     int port;
     Socket socket;
+    InputStream is;
+    OutputStream os;
     BufferedWriter bw;
     BufferedReader br;
     int roomID;
@@ -36,6 +40,22 @@ public class Player {
         this.server = server;
         this.port = port;
         this.socket = socket;
+    }
+
+    public InputStream getIs() {
+        return is;
+    }
+
+    public void setIs(InputStream is) {
+        this.is = is;
+    }
+
+    public OutputStream getOs() {
+        return os;
+    }
+
+    public void setOs(OutputStream os) {
+        this.os = os;
     }
 
     public int getRoomID() {

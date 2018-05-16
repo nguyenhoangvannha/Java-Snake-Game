@@ -19,7 +19,7 @@ import javax.swing.JLabel;
  * @author naco
  */
 public class RoomActivity extends javax.swing.JDialog {
-
+    Player player;
     int countDownTime = 10;
     Room room = new Room();
     int[] arrayRefVar = {1, 2, 3};
@@ -34,6 +34,8 @@ public class RoomActivity extends javax.swing.JDialog {
         initComponents();
         customizeUI();
         room.setID(roomID);
+        this.player = player;
+        getRoomInfo();
         if (room.getPlayers().size() < 1) {
             room.setOwner(player);
             labelsName.get(0).setText(player.getUserName());
@@ -450,4 +452,8 @@ public class RoomActivity extends javax.swing.JDialog {
     private javax.swing.JPanel pnPlayer4;
     private javax.swing.JProgressBar proCountDown;
     // End of variables declaration//GEN-END:variables
+
+    private void getRoomInfo() {
+        
+    }
 }
