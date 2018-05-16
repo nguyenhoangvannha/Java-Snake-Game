@@ -8,10 +8,13 @@ package crazy.snake.view;
 import crazy.snake.controller.ColorHelper;
 import crazy.snake.controller.CrazySnakeClient;
 import crazy.snake.controller.DataHelper;
+import crazy.snake.exceptions.UserNameAlreadyExistException;
 import crazy.snake.model.Player;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -20,8 +23,10 @@ import javax.swing.UnsupportedLookAndFeelException;
  * @author naco
  */
 public class MainActivity extends javax.swing.JFrame {
+
     CrazySnakeClient client;
     Player player;
+    DefaultListModel<String> onlineListModel;
 
     /**
      * Creates new form MainActivity
@@ -75,6 +80,7 @@ public class MainActivity extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Crazy Snake");
+        setIconImage(DataHelper.loadIcon());
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -292,11 +298,11 @@ public class MainActivity extends javax.swing.JFrame {
 
     private void btnNewRomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewRomActionPerformed
         // TODO add your handling code here:
-        if(player == null || player.getUserName().equals("")){
+        if (player == null || player.getUserName().equals("")) {
             DialogUtils.showWarning(this, "Attention", "Your have to connect to a server first");
         } else {
             int roomID = client.createNewRoom(player);
-            System.out.println("ROOM ID" +  roomID);
+            System.out.println("ROOM ID" + roomID);
             RoomActivity roomActivity = new RoomActivity(this, true, roomID, player);
             roomActivity.setVisible(true);
         }
@@ -308,10 +314,21 @@ public class MainActivity extends javax.swing.JFrame {
         if (verifyInput()) {
             client = new CrazySnakeClient();
             try {
-                client.connect(player);
+                String[] onlinePlayers = client.connect(player);
                 lblStatus.setText("Connected to " + player.getServer() + ":" + player.getPort());
+                System.out.println("Online list" + Arrays.toString(onlinePlayers));
+                for(String p: onlinePlayers){
+                    p = p.trim();
+                    if(p.equals(player.getUserName())){
+                        p += " (you)";
+                    }
+                    onlineListModel.addElement(p);
+                }
             } catch (IOException ex) {
                 DialogUtils.showWarning(this, "Error", "Cannot connect to server\n" + ex.toString());
+                btnConnect.setEnabled(true);
+            } catch (UserNameAlreadyExistException ex) {
+                DialogUtils.showWarning(this, "Error", "Username are alredy exist\n" + ex.toString());
                 btnConnect.setEnabled(true);
             }
         } else {
@@ -321,24 +338,23 @@ public class MainActivity extends javax.swing.JFrame {
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
-            try {
-                player.getBr().close();
-                player.getBw().close();
-                player.getSocket().close();
-            } catch (Exception ex) {
-                System.exit(0);
-                Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        try {
+            client.disConnect(player);
+            player.getBr().close();
+            player.getBw().close();
+            player.getSocket().close();
+        } catch (Exception ex) {
+        }
         System.exit(0);
     }//GEN-LAST:event_formWindowClosing
 
     private void btnJoinRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnJoinRoomActionPerformed
         // TODO add your handling code here:
-        if(player == null || player.getUserName().equals("")){
+        if (player == null || player.getUserName().equals("")) {
             DialogUtils.showWarning(this, "Attention", "Your have to connect to a server first");
         } else {
             int roomID = client.createNewRoom(player);
-            System.out.println("ROOM ID" +  roomID);
+            System.out.println("ROOM ID" + roomID);
             RoomActivity roomActivity = new RoomActivity(this, true, roomID, player);
             roomActivity.setVisible(true);
         }
@@ -387,6 +403,8 @@ public class MainActivity extends javax.swing.JFrame {
         lstOnline.setBackground(ColorHelper.bgColor);
         txtServer.setText(CrazySnakeClient.server);
         txtPort.setText(CrazySnakeClient.port + "");
+        onlineListModel = new DefaultListModel<>();
+        lstOnline.setModel(onlineListModel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -430,8 +448,8 @@ public class MainActivity extends javax.swing.JFrame {
             }
         } catch (Exception e) {
             DialogUtils.showWarning(this, "Attention", "Your port should be a number");
-                txtPort.requestFocus();
-                return false;
+            txtPort.requestFocus();
+            return false;
         }
         String userName = txtName.getText();
         if (userName.trim().equals("")) {
