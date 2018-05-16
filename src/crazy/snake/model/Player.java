@@ -20,6 +20,7 @@ public class Player {
     Socket socket;
     BufferedWriter bw;
     BufferedReader br;
+    int roomID;
 
     public Player() {
         userName = "nhvn";

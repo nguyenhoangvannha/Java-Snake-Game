@@ -69,8 +69,8 @@ public class MainActivity extends javax.swing.JFrame {
         btnNewRom = new javax.swing.JButton();
         pnJoinRoom = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
-        jButton3 = new javax.swing.JButton();
+        txtRoomID = new javax.swing.JTextField();
+        btnJoinRoom = new javax.swing.JButton();
         lblStatus = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -197,7 +197,12 @@ public class MainActivity extends javax.swing.JFrame {
 
         jLabel5.setText("Room ID");
 
-        jButton3.setText("Join Room");
+        btnJoinRoom.setText("Join Room");
+        btnJoinRoom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnJoinRoomActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnJoinRoomLayout = new javax.swing.GroupLayout(pnJoinRoom);
         pnJoinRoom.setLayout(pnJoinRoomLayout);
@@ -206,11 +211,11 @@ public class MainActivity extends javax.swing.JFrame {
             .addGroup(pnJoinRoomLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnJoinRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnJoinRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(pnJoinRoomLayout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField3)))
+                        .addComponent(txtRoomID)))
                 .addContainerGap())
         );
         pnJoinRoomLayout.setVerticalGroup(
@@ -219,9 +224,9 @@ public class MainActivity extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(pnJoinRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtRoomID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE)
+                .addComponent(btnJoinRoom, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -327,6 +332,18 @@ public class MainActivity extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_formWindowClosing
 
+    private void btnJoinRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnJoinRoomActionPerformed
+        // TODO add your handling code here:
+        if(player == null || player.getUserName().equals("")){
+            DialogUtils.showWarning(this, "Attention", "Your have to connect to a server first");
+        } else {
+            int roomID = client.createNewRoom(player);
+            System.out.println("ROOM ID" +  roomID);
+            RoomActivity roomActivity = new RoomActivity(this, true, roomID, player);
+            roomActivity.setVisible(true);
+        }
+    }//GEN-LAST:event_btnJoinRoomActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -374,8 +391,8 @@ public class MainActivity extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnConnect;
+    private javax.swing.JButton btnJoinRoom;
     private javax.swing.JButton btnNewRom;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -386,13 +403,13 @@ public class MainActivity extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField3;
     private javax.swing.JLabel lblStatus;
     private javax.swing.JList<String> lstOnline;
     private javax.swing.JPanel pnJoinGame;
     private javax.swing.JPanel pnJoinRoom;
     private javax.swing.JTextField txtName;
     private javax.swing.JTextField txtPort;
+    private javax.swing.JTextField txtRoomID;
     private javax.swing.JTextField txtServer;
     // End of variables declaration//GEN-END:variables
 

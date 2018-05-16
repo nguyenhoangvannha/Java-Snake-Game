@@ -81,47 +81,4 @@ public class CrazySnakeClient {
         }
         return -1;
     }
-
-//    /**
-//     * @param args the command line arguments
-//     */
-//    public static void main(String[] args) {
-//        // TODO code application logic here
-//        Socket s;
-//        try {
-//            s = new Socket("localhost", 3204);
-//            System.out.println(s.getPort());
-//            InputStream is = s.getInputStream();
-//            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-//
-//            OutputStream os = s.getOutputStream();
-//            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
-//
-//            String sentMessage = "";
-//            String receivedMessage;
-//
-//            System.out.println("Talking to Server");
-//
-//            do {
-//                DataInputStream din = new DataInputStream(System.in);
-//                sentMessage = din.readLine();
-//                bw.write(sentMessage);
-//                bw.newLine();
-//                bw.flush();
-//
-//                if (sentMessage.equalsIgnoreCase("quit")) {
-//                    break;
-//                } else {
-//                    receivedMessage = br.readLine();
-//                    System.out.println("Received : " + receivedMessage);
-//                }
-//
-//            } while (true);
-//
-//            bw.close();
-//            br.close();
-//        } catch (IOException ex) {
-//            Logger.getLogger(CrazySnakeClient.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//    }
 }

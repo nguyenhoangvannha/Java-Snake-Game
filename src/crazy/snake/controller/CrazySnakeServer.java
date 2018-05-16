@@ -35,8 +35,31 @@ public class CrazySnakeServer {
     public static final String MSG_GENERATE_ROOM_ID = "MSG_GENERATE_ROOM_ID";
     public static final String QUIT = "QUIT";
     public static final String MSG_CONNECT = "MSG_CONNECT";
+    public static String defaulServer = "localhost";
+    public static int defaultPort = 3204;
 
     public CrazySnakeServer() {
+    }
+
+
+    private static ServerSocket generateServer() {
+        try {
+            ServerSocket server = new ServerSocket(defaultPort);
+            return server;
+        } catch (IOException e) {
+            System.out.println("Port " + defaultPort + " is already used by another app!");
+        }
+        int port = 1;
+        while (port <= 65535) {
+            try {
+                ServerSocket server = new ServerSocket(port);
+                return server;
+            } catch (IOException e) {
+                System.out.println("Port " + port + " is already used by another app!");
+            }
+            port++;
+        }
+        return null;
     }
 
     static int createNewRoomID() {
@@ -69,9 +92,21 @@ public class CrazySnakeServer {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                //do your stuff
+                System.exit(0);
+            }
+        });
         try {
-            ServerSocket ss = new ServerSocket(3204);
+            ServerSocket ss = generateServer();
+            if(ss == null){
+                System.out.println("All port on this computer are already used cannot create server!");
+                System.exit(0);
+            }
             do {
+                System.out.println("Server port: " + ss.getLocalPort());
                 System.out.println("Waiting for client");
                 Socket s = ss.accept();
                 clientCount++;
@@ -145,5 +180,4 @@ public class CrazySnakeServer {
             System.out.println("Eror: " + ex.toString());
         }
     }
-
 }
