@@ -12,11 +12,16 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.util.Pair;
 
 /**
  *
@@ -36,10 +41,10 @@ public class CrazySnakeClient {
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             OutputStream os = s.getOutputStream();
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
-
-            player.setBr(br);
-            player.setBw(bw);
-
+            
+            player.setIs(is);
+            player.setOs(os);
+            
             bw.write(CrazySnakeServer.MSG_CONNECT + "|" + player.getUserName());
             bw.newLine();
             bw.flush();
@@ -54,17 +59,15 @@ public class CrazySnakeClient {
                 String[] players = receivedMessage.split(",");
                 return players;
             }
-            //bw.close();
         } catch (IOException ex) {
         }
-
         return null;
     }
 
     public void disConnect(Player player) {
         try {
-            BufferedReader br = player.getBr();
-            BufferedWriter bw = player.getBw();
+            BufferedReader br = new BufferedReader(new InputStreamReader(player.getIs()));
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(player.getOs()));
             bw.write(CrazySnakeServer.MSG_DISCONNECT + "|" + player.getUserName());
             bw.newLine();
             bw.flush();
@@ -74,15 +77,16 @@ public class CrazySnakeClient {
             } else {
                 System.out.println("Received : " + receivedMessage);
             }
-            //bw.close();
+            player.getIs().close();
+            player.getOs().close();
         } catch (Exception ex) {
         }
     }
 
     public int createNewRoom(Player player) {
         try {
-            BufferedReader br = player.getBr();
-            BufferedWriter bw = player.getBw();
+            BufferedReader br = new BufferedReader(new InputStreamReader(player.getIs()));
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(player.getOs()));
 
             String receivedMessage;
             System.out.println("Talking to Server");
@@ -99,34 +103,40 @@ public class CrazySnakeClient {
         } catch (IOException ex) {
             Logger.getLogger(CrazySnakeClient.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
         return -1;
     }
-    public int getRoomInfo(Player player) {
+    public Pair<String, ArrayList<String>> getRoomInfo(Player player) {
         try {
-            BufferedReader br = player.getBr();
-            BufferedWriter bw = player.getBw();
-
-            String receivedMessage;
+            BufferedReader br = new BufferedReader(new InputStreamReader(player.getIs()));
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(player.getOs()));
             System.out.println("Talking to Server");
-            bw.write(CrazySnakeServer.MSG_GENERATE_ROOM_ID + "|" + player.getUserName());
+            bw.write(CrazySnakeServer.MSG_GET_ROOM_INFO + "|" + player.getRoomID());
             bw.newLine();
             bw.flush();
-            receivedMessage = br.readLine();
-            System.out.println("Received : " + receivedMessage);
-            try {
-                int result = Integer.parseInt(receivedMessage);
-                return result;
-            } catch (Exception e) {
+            String roomAdmin = br.readLine();
+            System.out.println("RoomAdmin : " + roomAdmin);
+            String strmembers = br.readLine();
+            System.out.println("Members:" + strmembers);
+            ArrayList<String> members = new ArrayList<>();
+            strmembers = strmembers.replace("[", "");            
+            strmembers = strmembers.replace("]", "");
+            String[] arrMembers = strmembers.split(",");
+            for(String member: arrMembers){
+                member = member.trim();
+                members.add(member);
             }
+            Pair p = new Pair(roomAdmin, members);
+            return p;
         } catch (IOException ex) {
             Logger.getLogger(CrazySnakeClient.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return -1;
+        } 
+        return null;
     }
     public String joinRoom(Player player) {
         try {
-            BufferedReader br = player.getBr();
-            BufferedWriter bw = player.getBw();
+            BufferedReader br = new BufferedReader(new InputStreamReader(player.getIs()));
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(player.getOs()));
 
             String receivedMessage;
             System.out.println("Talking to Server");
@@ -142,8 +152,8 @@ public class CrazySnakeClient {
     }
     public int removeRoom(Player player) {
         try {
-            BufferedReader br = player.getBr();
-            BufferedWriter bw = player.getBw();
+            BufferedReader br = new BufferedReader(new InputStreamReader(player.getIs()));
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(player.getOs()));
 
             String receivedMessage;
             System.out.println("Talking to Server");

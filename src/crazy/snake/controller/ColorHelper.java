@@ -14,4 +14,6 @@ import java.awt.Color;
 public class ColorHelper {
     public static Color bgColorDracula = Color.decode("#45494A");
     public static Color bgColor = Color.decode("#FAFAFA");
+    public static Color ownerColor = Color.decode("#FF6633");
+    public static Color memberColor = Color.decode("#00CCCC");
 }

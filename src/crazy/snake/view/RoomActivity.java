@@ -8,10 +8,10 @@ package crazy.snake.view;
 import crazy.snake.controller.ColorHelper;
 import crazy.snake.model.Player;
 import crazy.snake.model.Room;
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.util.Pair;
 import javax.swing.JLabel;
 
 /**
@@ -34,23 +34,18 @@ public class RoomActivity extends javax.swing.JDialog {
         initComponents();
         customizeUI();
         room.setID(roomID);
+        room.setPlaying(false);
         this.player = player;
-        getRoomInfo();
-        if (room.getPlayers().size() < 1) {
-            room.setOwner(player);
-            labelsName.get(0).setText(player.getUserName());
-            labelsOwner.get(0).setText("Admin");
-        } else {
-            if(room.getPlayers().size() > 3){
-                DialogUtils.showWarning(this, "Error", "This room is already full");
-            } else {
-                labelsName.get(room.getPlayers().size()).setText(player.getUserName());
-                labelsOwner.get(room.getPlayers().size()).setForeground(Color.GREEN);
-                labelsOwner.get(room.getPlayers().size()).setText("You");
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                do{
+                    getRoomInfo();
+                    update();
+                } while(!room.isPlaying());
             }
-        }
-        room.getPlayers().add(player);
-        update();
+        });
+        thread.start();
     }
 
     /**
@@ -101,7 +96,6 @@ public class RoomActivity extends javax.swing.JDialog {
         lblOwer1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         lblOwer1.setForeground(new java.awt.Color(255, 102, 51));
         lblOwer1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblOwer1.setText("Owner");
 
         javax.swing.GroupLayout pnPlayer1Layout = new javax.swing.GroupLayout(pnPlayer1);
         pnPlayer1.setLayout(pnPlayer1Layout);
@@ -421,8 +415,13 @@ public class RoomActivity extends javax.swing.JDialog {
     private void update() {
         lblID.setText(room.getID() + "");
         lblMembers.setText(room.getPlayers().size() + "");
-        lblOwner.setText(room.getOwner().getUserName());
+        lblOwner.setText(room.getOwner());
         this.setTitle("Crazy Snake - Room: " + room.getID());
+        if(room.getOwner().equals(player.getUserName())){
+            btnStartGame.setText("Start Game");
+        } else {
+            btnStartGame.setText("Exit Room");
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -454,6 +453,21 @@ public class RoomActivity extends javax.swing.JDialog {
     // End of variables declaration//GEN-END:variables
 
     private void getRoomInfo() {
-        
+        Pair<String, ArrayList<String>> p = player.getCrazySnakeClient().getRoomInfo(player);
+        room.setOwner(p.getKey());
+        room.setPlayers(p.getValue());
+        int i = 0;
+        for(String member: room.getPlayers()){
+            labelsName.get(i).setText(member);
+            if(player.getUserName().equals(member)){
+                labelsOwner.get(i).setText("You");
+                labelsOwner.get(i).setForeground(ColorHelper.memberColor);
+            }
+            if(room.getOwner().equals(member)){
+                labelsOwner.get(i).setText("Owner");
+                labelsOwner.get(i).setForeground(ColorHelper.ownerColor);
+            }
+            i++;
+        }
     }
 }

@@ -345,8 +345,7 @@ public class MainActivity extends javax.swing.JFrame {
         // TODO add your handling code here:
         try {
             client.disConnect(player);
-            player.getBr().close();
-            player.getBw().close();
+            
             player.getSocket().close();
         } catch (Exception ex) {
         }

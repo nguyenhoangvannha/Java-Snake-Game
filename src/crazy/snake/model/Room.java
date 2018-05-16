@@ -13,8 +13,8 @@ import java.util.ArrayList;
  */
 public class Room {
     int ID;
-    Player owner;
-    ArrayList<Player> players;
+    String owner;
+    ArrayList<String> players;
     boolean playing;
 
     public Room() {
@@ -24,7 +24,7 @@ public class Room {
         playing = false;
     }
 
-    public Room(int ID, Player owner, ArrayList<Player> players, boolean playing) {
+    public Room(int ID, String owner, ArrayList<String> players, boolean playing) {
         this.ID = ID;
         this.owner = owner;
         this.players = players;
@@ -39,19 +39,19 @@ public class Room {
         this.ID = ID;
     }
 
-    public Player getOwner() {
+    public String getOwner() {
         return owner;
     }
 
-    public void setOwner(Player owner) {
+    public void setOwner(String owner) {
         this.owner = owner;
     }
 
-    public ArrayList<Player> getPlayers() {
+    public ArrayList<String> getPlayers() {
         return players;
     }
 
-    public void setPlayers(ArrayList<Player> players) {
+    public void setPlayers(ArrayList<String> players) {
         this.players = players;
     }
 
