@@ -62,7 +62,7 @@ public class CrazySnakeClient {
 
             String receivedMessage;
             System.out.println("Talking to Server");
-            bw.write(CrazySnakeServer.MSG_GENERATE_ROOM_ID);
+            bw.write(CrazySnakeServer.MSG_GENERATE_ROOM_ID + "|" + player.getUserName());
             bw.newLine();
             bw.flush();
             receivedMessage = br.readLine();

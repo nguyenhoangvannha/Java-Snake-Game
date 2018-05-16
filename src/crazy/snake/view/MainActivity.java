@@ -75,6 +75,11 @@ public class MainActivity extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Crazy Snake");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(0, 204, 204));
@@ -308,6 +313,27 @@ public class MainActivity extends javax.swing.JFrame {
             btnConnect.setEnabled(true);
         }
     }//GEN-LAST:event_btnConnectActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        if(player.getUserName() != null && !player.getUserName().equals("")){
+            try {
+                player.getBr().close();
+            } catch (IOException ex) {
+                Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            try {
+                player.getBw().close();
+            } catch (IOException ex) {
+                Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            try {
+                player.getSocket().close();
+            } catch (IOException ex) {
+                Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * @param args the command line arguments
