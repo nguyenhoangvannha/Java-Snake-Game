@@ -8,7 +8,6 @@ package crazy.snake.controller;
 import crazy.snake.model.Player;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -31,27 +30,35 @@ public class CrazySnakeClient {
         Socket s;
         s = new Socket(player.getServer(), player.getPort());
         System.out.println("Client connected to :" + s.getPort());
-        player.setSocket(s);
-        try {
-            OutputStream os = s.getOutputStream();
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
-            bw.write(CrazySnakeServer.MSG_CONNECT + "|" + player.getUserName());
-            bw.newLine();
-            bw.flush();
-            bw.close();
-        } catch (IOException ex) {
-            Logger.getLogger(CrazySnakeClient.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    public int createNewRoom(Player player) {
-        Socket s = player.getSocket();
         try {
             InputStream is = s.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
-
             OutputStream os = s.getOutputStream();
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
+            
+            player.setBr(br);
+            player.setBw(bw);
+            
+            bw.write(CrazySnakeServer.MSG_CONNECT + "|" + player.getUserName());
+            bw.newLine();
+            bw.flush();
+            //bw.close();
+        } catch (IOException ex) {
+            Logger.getLogger(CrazySnakeClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        player.setSocket(s);
+    }
+
+    public int createNewRoom(Player player) {
+        //Socket s = player.getSocket();
+        try {
+            //InputStream is = s.getInputStream();
+            //BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            BufferedReader br = player.getBr();
+
+//            OutputStream os = s.getOutputStream();
+//            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
+              BufferedWriter bw = player.getBw();
 
             String receivedMessage;
             System.out.println("Talking to Server");
@@ -65,8 +72,8 @@ public class CrazySnakeClient {
                 return result;
             } catch(Exception e){
             }
-            bw.close();
-            br.close();
+            //bw.close();
+            //br.close();
         } catch (IOException ex) {
             Logger.getLogger(CrazySnakeClient.class.getName()).log(Level.SEVERE, null, ex);
         }
