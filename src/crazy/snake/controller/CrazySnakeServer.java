@@ -15,6 +15,7 @@ import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -28,15 +29,18 @@ import java.util.logging.Logger;
  */
 public class CrazySnakeServer {
 
-    static int clientCount = 0;
-    static HashMap<Integer, ArrayList<String>> rooms = new HashMap<>();
-    static HashMap<Integer, String> roomsAdmin = new HashMap<>();
-    static ArrayList<String> players = new ArrayList<String>();
     public static final String MSG_GENERATE_ROOM_ID = "MSG_GENERATE_ROOM_ID";
+    public static final String MSG_JOIN_ROOM = "MSG_JOIN_ROOM";
     public static final String QUIT = "QUIT";
     public static final String MSG_CONNECT = "MSG_CONNECT";
     public static final String MSG_DISCONNECT = "MSG_DISCONNECT";
     public static final String MSG_ERROR = "MSG_ERROR";
+    public static final String MSG_SUCCESS = "MSG_SUCCESS";
+    
+    static int clientCount = 0;
+    static HashMap<Integer, ArrayList<String>> rooms = new HashMap<>();
+    static HashMap<Integer, String> roomsAdmin = new HashMap<Integer, String>();
+    static ArrayList<String> players = new ArrayList<String>();
     public static String defaulServer = "localhost";
     public static int defaultPort = 3204;
 
@@ -118,6 +122,21 @@ public class CrazySnakeServer {
             System.out.println("Eror: " + ex.toString());
         }
     }
+    static String joinRoom(int roomID, String userName){
+        if(!rooms.containsKey(roomID)){
+            return MSG_ERROR + " room does not exist";
+        } else {
+            if(rooms.get(roomID).size() > 3){
+                return MSG_ERROR + " room is full";
+            } else {
+                rooms.get(roomID).add(userName);
+                if(roomsAdmin.get(roomID).equals("")){
+                    roomsAdmin.get(roomID).replaceAll(roomsAdmin.get(roomID), userName);
+                }
+                return MSG_SUCCESS;
+            }
+        }
+    }
 
     static class ClientThread extends Thread {
 
@@ -145,6 +164,7 @@ public class CrazySnakeServer {
                 do {
                     receivedMessage = br.readLine();
                     String userName = "";
+                    int roomID = -1;
                     try {
                         if (receivedMessage != null) {
                             System.out.println("Received : " + receivedMessage);
@@ -159,6 +179,15 @@ public class CrazySnakeServer {
                             if (receivedMessage.contains(CrazySnakeServer.MSG_GENERATE_ROOM_ID)) {
                                 userName = receivedMessage.substring(receivedMessage.indexOf("|") + 1);
                                 receivedMessage = CrazySnakeServer.MSG_GENERATE_ROOM_ID;
+                            }
+                            if (receivedMessage.contains(CrazySnakeServer.MSG_JOIN_ROOM)) {
+                                String[] strs = receivedMessage.split("\\|");
+                                try{
+                                    roomID = Integer.parseInt(strs[1].trim());
+                                } catch(Exception ebc){
+                                }
+                                userName = strs[2];
+                                receivedMessage = CrazySnakeServer.MSG_JOIN_ROOM;
                             }
                         }
                     } catch (Exception eb) {
@@ -204,6 +233,11 @@ public class CrazySnakeServer {
                                 members.add(userName);
                                 rooms.put(newRoomID, members);
                                 roomsAdmin.put(newRoomID, userName);
+                                break;
+                            case CrazySnakeServer.MSG_JOIN_ROOM:
+                                bw.write(joinRoom(roomID, userName));
+                                bw.newLine();
+                                bw.flush();
                                 break;
                             case QUIT:
                                 System.out.println("Client has left !");

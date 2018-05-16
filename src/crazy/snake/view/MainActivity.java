@@ -7,6 +7,7 @@ package crazy.snake.view;
 
 import crazy.snake.controller.ColorHelper;
 import crazy.snake.controller.CrazySnakeClient;
+import crazy.snake.controller.CrazySnakeServer;
 import crazy.snake.controller.DataHelper;
 import crazy.snake.exceptions.UserNameAlreadyExistException;
 import crazy.snake.model.Player;
@@ -364,10 +365,15 @@ public class MainActivity extends javax.swing.JFrame {
             btnConnect.requestFocus();
         } else {
             if(validateRoomID()){
-                int roomID = client.createNewRoom(player);
-                System.out.println("ROOM ID" + roomID);
-                RoomActivity roomActivity = new RoomActivity(this, true, roomID, player);
-                roomActivity.setVisible(true);
+                String msg = client.joinRoom(player);
+                System.out.println("Result " + msg);
+                if(msg.contains(CrazySnakeServer.MSG_ERROR)){
+                    DialogUtils.showWarning(this, "Attention", msg);
+                    btnJoinRoom.requestFocus();
+                } else {
+                    RoomActivity roomActivity = new RoomActivity(this, true, player.getRoomID(), player);
+                    roomActivity.setVisible(true);
+                }
             }
         }
     }//GEN-LAST:event_btnJoinRoomActionPerformed
