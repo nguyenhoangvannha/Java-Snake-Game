@@ -34,6 +34,7 @@ public class MainActivity extends javax.swing.JFrame {
     DefaultListModel<String> onlineListModel;
     boolean isConnected = false;
     Thread refreshOnline;
+
     /**
      * Creates new form MainActivity
      */
@@ -56,7 +57,7 @@ public class MainActivity extends javax.swing.JFrame {
         }
         initComponents();
         customizeUI();
-        
+
     }
 
     /**
@@ -308,7 +309,7 @@ public class MainActivity extends javax.swing.JFrame {
 
     private void btnNewRomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewRomActionPerformed
         // TODO add your handling code here:
-        if (player == null || player.getUserName().equals("")) {
+        if (player == null || client == null || player.getUserName().equals("")) {
             DialogUtils.showWarning(this, "Attention", "Your have to connect to a server first");
             btnConnect.requestFocus();
         } else {
@@ -324,54 +325,64 @@ public class MainActivity extends javax.swing.JFrame {
 
     private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConnectActionPerformed
         // TODO add your handling code here:
-        btnConnect.setEnabled(false);
-        if (verifyInput()) {
-            client = new CrazySnakeClient();
-            try {
-                String[] onlinePlayers = client.connect(player);
-                isConnected = true;
-                lblStatus.setText("Connected to " + player.getServer() + ":" + player.getPort());
-                System.out.println("Online list" + Arrays.toString(onlinePlayers));
-
-                player.setCrazySnakeClient(client);
-
-                refreshOnline = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        do {
-                            onlineListModel.removeAllElements();
-                            String[] onlinePlayers = client.getPlayers(player);
-                            System.out.println(Arrays.toString(onlinePlayers));
-                            if(onlinePlayers != null)
-                            for (String p : onlinePlayers) {
-                                p = p.trim();
-                                if (p.equals(player.getUserName())) {
-                                    p += " (you)";
-                                }
-                                onlineListModel.addElement(p);
-                            }
-                            try {
-                                Thread.sleep(2000);
-                            } catch (InterruptedException ex) {
-                                Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        } while (isConnected);
-                    }
-                });
-                refreshOnline.start();
-            } catch (IOException ex) {
-                isConnected = false;
-                DialogUtils.showWarning(this, "Error", "Cannot connect to server\n" + ex.toString());
-                btnConnect.setEnabled(true);
-            } catch (UserNameAlreadyExistException ex) {
-                isConnected = false;
-                DialogUtils.showWarning(this, "Error", "Username are alredy exist\n" + ex.toString());
-                btnConnect.setEnabled(true);
-            }
-        } else {
+        if (isConnected) {
+            client.disConnect(player);
             isConnected = false;
-            btnConnect.setEnabled(true);
+            btnConnect.setText("Connect");
+            client = null;
+            onlineListModel.removeAllElements();
+        } else {
+            if (verifyInput()) {
+                client = new CrazySnakeClient();
+                try {
+                    String[] onlinePlayers = client.connect(player);
+                    isConnected = true;
+                    btnConnect.setText("Disconnect");
+                    lblStatus.setText("Connected to " + player.getServer() + ":" + player.getPort());
+                    System.out.println("Online list" + Arrays.toString(onlinePlayers));
+
+                    player.setCrazySnakeClient(client);
+
+                    refreshOnline = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            do {
+                                onlineListModel.removeAllElements();
+                                String[] onlinePlayers = client.getPlayers(player);
+                                System.out.println(Arrays.toString(onlinePlayers));
+                                if (onlinePlayers != null) {
+                                    for (String p : onlinePlayers) {
+                                        p = p.trim();
+                                        if (p.equals(player.getUserName())) {
+                                            p += " (you)";
+                                        }
+                                        onlineListModel.addElement(p);
+                                    }
+                                }
+                                try {
+                                    Thread.sleep(2000);
+                                } catch (InterruptedException ex) {
+                                    Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            } while (isConnected);
+                        }
+                    });
+                    refreshOnline.start();
+                } catch (IOException ex) {
+                    isConnected = false;
+                    btnConnect.setText("Connect");
+                    DialogUtils.showWarning(this, "Error", "Cannot connect to server\n" + ex.toString());
+                } catch (UserNameAlreadyExistException ex) {
+                    isConnected = false;
+                    btnConnect.setText("Connect");
+                    DialogUtils.showWarning(this, "Error", "Username are alredy exist\n" + ex.toString());
+                }
+            } else {
+                isConnected = false;
+                btnConnect.setText("Connect");
+            }
         }
+
     }//GEN-LAST:event_btnConnectActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
