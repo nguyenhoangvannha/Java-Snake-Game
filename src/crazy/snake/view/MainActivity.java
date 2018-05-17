@@ -11,7 +11,11 @@ import crazy.snake.controller.CrazySnakeServer;
 import crazy.snake.controller.DataHelper;
 import crazy.snake.exceptions.UserNameAlreadyExistException;
 import crazy.snake.model.Player;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,6 +38,10 @@ public class MainActivity extends javax.swing.JFrame {
      * Creates new form MainActivity
      */
     public MainActivity() {
+        URL url = ClassLoader.getSystemResource("crazy/snake/res/icon.jpg");
+        Toolkit kit = Toolkit.getDefaultToolkit();
+        Image img = kit.createImage(url);
+        this.setIconImage(img);
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             //UIManager.setLookAndFeel("com.bulenkov.darcula.DarculaLaf");
@@ -48,6 +56,7 @@ public class MainActivity extends javax.swing.JFrame {
         }
         initComponents();
         customizeUI();
+        
     }
 
     /**
@@ -83,7 +92,6 @@ public class MainActivity extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Crazy Snake");
-        setIconImage(DataHelper.loadIcon());
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -370,7 +378,6 @@ public class MainActivity extends javax.swing.JFrame {
         // TODO add your handling code here:
         try {
             client.disConnect(player);
-
             player.getSocket().close();
         } catch (Exception ex) {
         }
@@ -447,7 +454,7 @@ public class MainActivity extends javax.swing.JFrame {
     }
 
     private void customizeUI() {
-        this.setIconImage(DataHelper.loadIcon());
+        //this.setIconImage(DataHelper.loadIcon());
         this.setLocationRelativeTo(null);
         this.getContentPane().setBackground(ColorHelper.bgColor);
         txtServer.setText(CrazySnakeClient.server);

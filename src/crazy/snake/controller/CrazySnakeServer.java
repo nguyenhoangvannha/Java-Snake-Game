@@ -94,19 +94,18 @@ public class CrazySnakeServer {
         }
         return sb.toString();
     }
-    static void leaveRoom(int roomID, String userName){
-        if(roomsAdmin.get(roomID).equals(userName) &&  rooms.get(roomID).size() > 1){
-            rooms.get(roomID).remove(userName);
+
+    static void leaveRoom(int roomID, String userName) {
+        rooms.get(roomID).remove(userName);
+        if (roomsAdmin.get(roomID) != null && roomsAdmin.get(roomID).equals(userName) && rooms.get(roomID).size() > 0) {
             roomsAdmin.replace(roomID, rooms.get(roomID).get(0));
         }
-        if(rooms.get(roomID).size() < 1){
+        if (rooms.get(roomID) != null && rooms.get(roomID).size() < 1) {
             rooms.remove(roomID);
             roomsAdmin.remove(roomID);
-        } else {
-            rooms.get(roomID).remove(userName);
         }
-        
     }
+
     /**
      * @param args the command line arguments
      */
@@ -123,15 +122,16 @@ public class CrazySnakeServer {
             if (ss == null) {
                 System.out.println("All port on this computer are already used cannot create server!");
                 System.exit(0);
+            } else {
+                do {
+                    System.out.println("Server port: " + ss.getLocalPort());
+                    System.out.println("Waiting for client");
+                    Socket s = ss.accept();
+                    clientCount++;
+                    ClientThread clienThread = new ClientThread(s);
+                    clienThread.start();
+                } while (true);
             }
-            do {
-                System.out.println("Server port: " + ss.getLocalPort());
-                System.out.println("Waiting for client");
-                Socket s = ss.accept();
-                clientCount++;
-                ClientThread clienThread = new ClientThread(s);
-                clienThread.start();
-            } while (true);
         } catch (IOException ex) {
             System.out.println("Eror: " + ex.toString());
         }

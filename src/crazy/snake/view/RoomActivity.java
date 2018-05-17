@@ -19,13 +19,15 @@ import javax.swing.JLabel;
  * @author naco
  */
 public class RoomActivity extends javax.swing.JDialog {
+
     Player player;
     int countDownTime = 10;
     Room room = new Room();
     int[] arrayRefVar = {1, 2, 3};
     ArrayList<JLabel> labelsName;
     ArrayList<JLabel> labelsOwner;
-Thread refrestUI;
+    Thread refrestUI;
+
     /**
      * Creates new form RoomActivity
      */
@@ -39,7 +41,7 @@ Thread refrestUI;
         refrestUI = new Thread(new Runnable() {
             @Override
             public void run() {
-                do{
+                do {
                     getRoomInfo();
                     update();
                     try {
@@ -47,7 +49,7 @@ Thread refrestUI;
                     } catch (InterruptedException ex) {
                         Logger.getLogger(RoomActivity.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                } while(!room.isPlaying());
+                } while (!room.isPlaying());
             }
         });
         refrestUI.start();
@@ -377,27 +379,18 @@ Thread refrestUI;
 
     private void btnStartGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartGameActionPerformed
         // TODO add your handling code here:
-        if (room.getPlayers().size() < 2) {
-            DialogUtils.showWarning(this, "Cannot play game", "Room need more than one member to play");
+        if (!room.getOwner().equals(player.getUserName()) || room.getPlayers().size() < 2) {
+            refrestUI.stop();
+            leaveRoom();
+            this.dispose();
         } else {
-            btnStartGame.setEnabled(false);
-            Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    for (int i = 1; i <= countDownTime; i++) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(RoomActivity.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                        proCountDown.setValue(i);
-                        lblCountDown.setText(countDownTime - i + "");
-                    }
-                    startGame();
-                }
-            });
-            thread.start();
+            if (room.isPlaying()) {
+                DialogUtils.showWarning(this, "Erro", "Another game is playing");
+            } else {
+                startCountdown();
+            }
         }
+
     }//GEN-LAST:event_btnStartGameActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
@@ -408,8 +401,34 @@ Thread refrestUI;
     private void leaveRoom() {
         player.getCrazySnakeClient().leaveRoom(room.getID(), player);
     }
+
+    void startCountdown() {
+        btnStartGame.setEnabled(false);
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 1; i <= countDownTime; i++) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(RoomActivity.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    proCountDown.setValue(i);
+                    lblCountDown.setText(countDownTime - i + "");
+                }
+                startGame();
+            }
+        });
+        thread.start();
+    }
+
     void startGame() {
+        room.setPlaying(true);
+        refrestUI.suspend();
         System.out.println("Start Game");
+        FrameScreen frameScreen = new FrameScreen(this, true);
+        frameScreen.setVisible(true);
+        room.setPlaying(false);
     }
 
     private void customizeUI() {
@@ -436,10 +455,10 @@ Thread refrestUI;
         lblMembers.setText(room.getPlayers().size() + "");
         lblOwner.setText(room.getOwner());
         this.setTitle("Crazy Snake - Room: " + room.getID());
-        if(room.getOwner().equals(player.getUserName())){
-            btnStartGame.setText("Start Game");
-        } else {
+        if (!room.getOwner().equals(player.getUserName()) || room.getPlayers().size() < 2) {
             btnStartGame.setText("Exit Room");
+        } else {
+            btnStartGame.setText("Start Game");
         }
     }
 
@@ -476,25 +495,24 @@ Thread refrestUI;
         room.setOwner(p.getKey());
         room.setPlayers(p.getValue());
         int i = 0;
-        for(String member: room.getPlayers()){
+        for (String member : room.getPlayers()) {
             labelsName.get(i).setText(member);
-            if(player.getUserName().equals(member)){
+            if (player.getUserName().equals(member)) {
                 labelsOwner.get(i).setText("You");
                 labelsOwner.get(i).setForeground(ColorHelper.memberColor);
             }
-            if(room.getOwner().equals(member)){
+            if (room.getOwner().equals(member)) {
                 labelsOwner.get(i).setText("Owner");
                 labelsOwner.get(i).setForeground(ColorHelper.ownerColor);
             }
             i++;
         }
-        if(i < 3){
-            for(int j = i; j < 4; j++){
+        if (i < 3) {
+            for (int j = i; j < 4; j++) {
                 labelsName.get(j).setText("?");
                 labelsOwner.get(j).setText("");
             }
         }
     }
 
-    
 }
