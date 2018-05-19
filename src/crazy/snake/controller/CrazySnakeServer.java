@@ -38,10 +38,12 @@ public class CrazySnakeServer {
     public static final String MSG_ERROR = "MSG_ERROR";
     public static final String MSG_SUCCESS = "MSG_SUCCESS";
     public static final String MSG_LEAVE_ROOM = "MSG_LEAVE_ROOM";
+    public static final String MSG_START_ROOM = "MSG_START_ROOM";
 
     static int clientCount = 0;
     static HashMap<Integer, ArrayList<String>> rooms = new HashMap<>();
     static HashMap<Integer, String> roomsAdmin = new HashMap<Integer, String>();
+    static ArrayList<Integer> playingRooms = new ArrayList<Integer>();
     static ArrayList<String> players = new ArrayList<String>();
     public static String defaulServer = "localhost";
     public static int defaultPort = 3204;
@@ -82,6 +84,10 @@ public class CrazySnakeServer {
         return result;
     }
 
+    static void startRoom(int roomID){
+        playingRooms.add(roomID);
+    }
+    
     static String getOnlinePlayers() {
         StringBuilder sb = new StringBuilder("");
         Iterator it = rooms.entrySet().iterator();
@@ -219,6 +225,13 @@ public class CrazySnakeServer {
                                 }
                                 receivedMessage = CrazySnakeServer.MSG_GET_ROOM_INFO;
                             }
+                            if (receivedMessage.contains(CrazySnakeServer.MSG_START_ROOM)) {
+                                try {
+                                    roomID = Integer.parseInt(receivedMessage.substring(receivedMessage.indexOf("|") + 1));
+                                } catch (Exception ebc) {
+                                }
+                                receivedMessage = CrazySnakeServer.MSG_START_ROOM;
+                            }
                         }
                     } catch (Exception eb) {
 
@@ -269,6 +282,8 @@ public class CrazySnakeServer {
                                 bw.newLine();
                                 bw.write(rooms.get(roomID).toString());
                                 bw.newLine();
+                                bw.write(playingRooms.contains(roomID) ? "true":"false");
+                                bw.newLine();
                                 bw.flush();
                                 break;
                             case CrazySnakeServer.MSG_LEAVE_ROOM:
@@ -283,6 +298,9 @@ public class CrazySnakeServer {
                                 bw.write(joinRoom(roomID, userName));
                                 bw.newLine();
                                 bw.flush();
+                                break;
+                            case CrazySnakeServer.MSG_START_ROOM:
+                                startRoom(roomID);
                                 break;
                             case QUIT:
                                 System.out.println("Client has left !");

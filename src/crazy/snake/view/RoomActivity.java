@@ -27,6 +27,7 @@ public class RoomActivity extends javax.swing.JDialog {
     ArrayList<JLabel> labelsName;
     ArrayList<JLabel> labelsOwner;
     Thread refrestUI;
+    boolean isStarted = false;
 
     /**
      * Creates new form RoomActivity
@@ -45,7 +46,7 @@ public class RoomActivity extends javax.swing.JDialog {
                     getRoomInfo();
                     update();
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(1000);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(RoomActivity.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -379,15 +380,16 @@ public class RoomActivity extends javax.swing.JDialog {
 
     private void btnStartGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartGameActionPerformed
         // TODO add your handling code here:
-        if (!room.getOwner().equals(player.getUserName()) || room.getPlayers().size() < 2) {
+        if (room.getPlayers().size() < 2) {
             refrestUI.stop();
             leaveRoom();
             this.dispose();
         } else {
-            if (room.isPlaying()) {
-                DialogUtils.showWarning(this, "Erro", "Another game is playing");
-            } else {
-                startCountdown();
+            if(room.getOwner().equals(player.getUserName())){
+                //for admin
+                player.getCrazySnakeClient().startRoom(player);
+                btnStartGame.setEnabled(false);
+                //startCountdown();
             }
         }
 
@@ -460,6 +462,11 @@ public class RoomActivity extends javax.swing.JDialog {
         } else {
             btnStartGame.setText("Start Game");
         }
+        if(isStarted){
+            startCountdown();
+            refrestUI.suspend();
+            //isStarted = false;
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -491,8 +498,11 @@ public class RoomActivity extends javax.swing.JDialog {
     // End of variables declaration//GEN-END:variables
 
     private void getRoomInfo() {
-        Pair<String, ArrayList<String>> p = player.getCrazySnakeClient().getRoomInfo(player);
-        room.setOwner(p.getKey());
+        //Pair<String, ArrayList<String>> p = player.getCrazySnakeClient().getRoomInfo(player);
+        Pair<Boolean, ArrayList<String>> p = player.getCrazySnakeClient().refreshRoom(player);
+        isStarted = p.getKey();
+        room.setOwner(p.getValue().get(0));
+        p.getValue().remove(0);
         room.setPlayers(p.getValue());
         int i = 0;
         for (String member : room.getPlayers()) {

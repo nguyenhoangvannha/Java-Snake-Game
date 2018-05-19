@@ -190,13 +190,33 @@ public class CrazySnakeClient {
             System.out.println("RoomAdmin : " + roomAdmin);
             String strmembers = br.readLine();
             System.out.println("Members:" + strmembers);
+            String started = br.readLine();
+            System.out.println("Started:" + started);
+            
+            boolean isStarted = false;
+            if(started.equals("true")) isStarted = true;
+            if(started.equals("false")) isStarted = false;
             ArrayList<String> members = getMemberList(strmembers);
-            Pair p = new Pair(roomAdmin, members);
+            members.add(0, roomAdmin);
+            Pair p = new Pair(isStarted, members);
             return p;
         } catch (IOException ex) {
             Logger.getLogger(CrazySnakeClient.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
+    }
+    
+    public void startRoom(Player player) {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(player.getIs()));
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(player.getOs()));
+            System.out.println("Talking to Server");
+            bw.write(CrazySnakeServer.MSG_START_ROOM + "|" + player.getRoomID());
+            bw.newLine();
+            bw.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(CrazySnakeClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public String joinRoom(Player player) {
