@@ -512,7 +512,7 @@ public class RoomActivity extends javax.swing.JDialog {
                 labelsOwner.get(i).setForeground(ColorHelper.memberColor);
             }
             if (room.getOwner().equals(member)) {
-                labelsOwner.get(i).setText("Owner");
+                labelsOwner.get(i).setText("Admin");
                 labelsOwner.get(i).setForeground(ColorHelper.ownerColor);
             }
             i++;
