@@ -372,10 +372,12 @@ public class MainActivity extends javax.swing.JFrame {
                     isConnected = false;
                     btnConnect.setText("Connect");
                     DialogUtils.showWarning(this, "Error", "Cannot connect to server\n" + ex.toString());
+                    client = null;
                 } catch (UserNameAlreadyExistException ex) {
                     isConnected = false;
                     btnConnect.setText("Connect");
                     DialogUtils.showWarning(this, "Error", "Username are alredy exist\n" + ex.toString());
+                    client = null;
                 }
             } else {
                 isConnected = false;
