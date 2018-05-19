@@ -45,7 +45,7 @@ public class RoomActivity extends javax.swing.JDialog {
                     getRoomInfo();
                     update();
                     try {
-                        Thread.sleep(500);
+                        Thread.sleep(100);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(RoomActivity.class.getName()).log(Level.SEVERE, null, ex);
                     }

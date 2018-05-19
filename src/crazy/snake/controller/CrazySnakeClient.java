@@ -55,6 +55,7 @@ public class CrazySnakeClient {
     public String[] connect(Player player) throws IOException, UserNameAlreadyExistException {
         Socket s;
         s = new Socket(player.getServer(), player.getPort());
+        s.setSoTimeout(3000);
         System.out.println("Client connected to :" + s.getPort());
         try {
             InputStream is = s.getInputStream();
@@ -158,6 +159,26 @@ public class CrazySnakeClient {
     
 
     public Pair<String, ArrayList<String>> getRoomInfo(Player player) {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(player.getIs()));
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(player.getOs()));
+            System.out.println("Talking to Server");
+            bw.write(CrazySnakeServer.MSG_GET_ROOM_INFO + "|" + player.getRoomID());
+            bw.newLine();
+            bw.flush();
+            String roomAdmin = br.readLine();
+            System.out.println("RoomAdmin : " + roomAdmin);
+            String strmembers = br.readLine();
+            System.out.println("Members:" + strmembers);
+            ArrayList<String> members = getMemberList(strmembers);
+            Pair p = new Pair(roomAdmin, members);
+            return p;
+        } catch (IOException ex) {
+            Logger.getLogger(CrazySnakeClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    public Pair<Boolean, ArrayList<String>> refreshRoom(Player player) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(player.getIs()));
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(player.getOs()));
