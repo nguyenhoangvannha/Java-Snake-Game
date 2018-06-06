@@ -380,19 +380,16 @@ public class RoomActivity extends javax.swing.JDialog {
 
     private void btnStartGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartGameActionPerformed
         // TODO add your handling code here:
-        if (room.getPlayers().size() < 2) {
-            refrestUI.stop();
-            leaveRoom();
-            this.dispose();
-        } else {
-            if(room.getOwner().equals(player.getUserName())){
+        if(room.getOwner().equals(player.getUserName()) && room.getPlayers().size() > 1){
                 //for admin
                 player.getCrazySnakeClient().startRoom(player);
                 btnStartGame.setEnabled(false);
                 //startCountdown();
+            } else{
+                refrestUI.stop();
+                leaveRoom();
+                this.dispose();
             }
-        }
-
     }//GEN-LAST:event_btnStartGameActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
