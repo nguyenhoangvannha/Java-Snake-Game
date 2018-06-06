@@ -150,11 +150,15 @@ public class CrazySnakeServer {
             if (rooms.get(roomID).size() > 3) {
                 return MSG_ERROR + " room is full";
             } else {
-                rooms.get(roomID).add(userName);
-                if (roomsAdmin.get(roomID).equals("")) {
-                    roomsAdmin.get(roomID).replaceAll(roomsAdmin.get(roomID), userName);
+                if(playingRooms.contains(roomID)){
+                    return MSG_ERROR + " room is playing";
+                } else {
+                    rooms.get(roomID).add(userName);
+                    if (roomsAdmin.get(roomID).equals("")) {
+                        roomsAdmin.get(roomID).replaceAll(roomsAdmin.get(roomID), userName);
+                    }
+                    return MSG_SUCCESS;
                 }
-                return MSG_SUCCESS;
             }
         }
     }
