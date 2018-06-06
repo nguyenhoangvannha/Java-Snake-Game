@@ -179,6 +179,9 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtName">
+          <Events>
+            <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtNameKeyPressed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnConnect">
           <Properties>
@@ -336,6 +339,9 @@
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="txtRoomID">
+              <Events>
+                <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtRoomIDKeyPressed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="btnJoinRoom">
               <Properties>

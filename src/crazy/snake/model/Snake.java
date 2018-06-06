@@ -21,10 +21,12 @@ public class Snake {
     int x[];
     int y[];
     int direction;
+    Color color = Color.BLUE;
     public static final int LEFT = 1;
     public static final int RIGHT = -1;
     public static final int UP = 2;
     public static final int DOWN = -2;
+    DataHelper dataHelper;
     public Snake(){
         direction = RIGHT;
         name = "Default";
@@ -33,17 +35,18 @@ public class Snake {
         y = new int[GameScreen.MAX_ROW];
         x[0] = 0;
         y[0] = 0;
-        
+        dataHelper = new DataHelper();
     }
     public void drawSnake(Graphics g){
-        g.setColor(Color.green);
+        g.setColor(color);
         //g.fillOval(x[0] * 20 + 1, y[0] * 20 + 1, 19, 19);
         for(int i = 1; i < length; i++){
             //g.fillRect(x[i] * 20 + 1, y[i] * 20 + 1, 19, 19);
             g.fillOval(x[i] * 20 + 1, y[i] * 20 + 1, 19, 19);
         }
-        DataHelper.loadHead(direction);
-        g.drawImage(DataHelper.snakeHead, x[0] * 20 + 1, y[0] * 20 + 1, null);
+        //dataHelper.loadHead2(direction);
+        //g.drawImage(DataHelper.snakeHead, x[0] * 20 + 1, y[0] * 20 + 1, null);
+        g.fillOval(x[0] * 20 + 1, y[0] * 20 + 1, 17, 17);
     }
     public void update(int direction){
         for(int i = length - 1; i > 0; i--){

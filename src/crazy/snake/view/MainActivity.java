@@ -5,6 +5,7 @@
  */
 package crazy.snake.view;
 
+import com.sun.glass.events.KeyEvent;
 import crazy.snake.controller.ColorHelper;
 import crazy.snake.controller.CrazySnakeClient;
 import crazy.snake.controller.CrazySnakeServer;
@@ -19,6 +20,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.input.KeyCode;
 import javax.swing.DefaultListModel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -127,6 +129,12 @@ public class MainActivity extends javax.swing.JFrame {
 
         jLabel3.setText("Your name");
 
+        txtName.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtNameKeyPressed(evt);
+            }
+        });
+
         btnConnect.setText("Connect");
         btnConnect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -213,6 +221,12 @@ public class MainActivity extends javax.swing.JFrame {
         pnJoinRoom.setForeground(new java.awt.Color(204, 204, 204));
 
         jLabel5.setText("Room ID");
+
+        txtRoomID.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtRoomIDKeyPressed(evt);
+            }
+        });
 
         btnJoinRoom.setText("Join Room");
         btnJoinRoom.addActionListener(new java.awt.event.ActionListener() {
@@ -325,10 +339,13 @@ public class MainActivity extends javax.swing.JFrame {
 
     private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConnectActionPerformed
         // TODO add your handling code here:
+        connectAction();
+    }//GEN-LAST:event_btnConnectActionPerformed
+
+    private void connectAction(){
         if (isConnected) {
             client.disConnect(player);
-            isConnected = false;
-            btnConnect.setText("Connect");
+            enableInput();
             client = null;
             onlineListModel.removeAllElements();
         } else {
@@ -336,8 +353,7 @@ public class MainActivity extends javax.swing.JFrame {
                 client = new CrazySnakeClient();
                 try {
                     String[] onlinePlayers = client.connect(player);
-                    isConnected = true;
-                    btnConnect.setText("Disconnect");
+                    disableInput();
                     lblStatus.setText("Connected to " + player.getServer() + ":" + player.getPort());
                     System.out.println("Online list" + Arrays.toString(onlinePlayers));
 
@@ -369,24 +385,35 @@ public class MainActivity extends javax.swing.JFrame {
                     });
                     refreshOnline.start();
                 } catch (IOException ex) {
-                    isConnected = false;
-                    btnConnect.setText("Connect");
+                    enableInput();
                     DialogUtils.showWarning(this, "Error", "Cannot connect to server\n" + ex.toString());
                     client = null;
                 } catch (UserNameAlreadyExistException ex) {
-                    isConnected = false;
-                    btnConnect.setText("Connect");
+                    enableInput();
                     DialogUtils.showWarning(this, "Error", "Username are alredy exist\n" + ex.toString());
                     client = null;
                 }
             } else {
-                isConnected = false;
-                btnConnect.setText("Connect");
+                enableInput();
             }
         }
-
-    }//GEN-LAST:event_btnConnectActionPerformed
-
+    }
+    private void enableInput(){
+        isConnected = false;
+        btnConnect.setText("Connect");
+        txtPort.setEnabled(true);
+        txtName.setEnabled(true);
+        txtServer.setEnabled(true);
+    }
+    
+    private void disableInput(){
+        isConnected = true;
+        btnConnect.setText("Disconnect");
+        txtPort.setEnabled(false);
+        txtName.setEnabled(false);
+        txtServer.setEnabled(false);
+    }
+    
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
         try {
@@ -399,6 +426,10 @@ public class MainActivity extends javax.swing.JFrame {
 
     private void btnJoinRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnJoinRoomActionPerformed
         // TODO add your handling code here:
+        joinRoom();
+    }//GEN-LAST:event_btnJoinRoomActionPerformed
+
+    private void joinRoom(){
         if (player == null || player.getUserName().equals("")) {
             DialogUtils.showWarning(this, "Attention", "Your have to connect to a server first");
             btnConnect.requestFocus();
@@ -417,7 +448,22 @@ public class MainActivity extends javax.swing.JFrame {
                 }
             }
         }
-    }//GEN-LAST:event_btnJoinRoomActionPerformed
+    }
+    
+    private void txtNameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNameKeyPressed
+        // TODO add your handling code here:
+        
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+            connectAction();
+        }
+    }//GEN-LAST:event_txtNameKeyPressed
+
+    private void txtRoomIDKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtRoomIDKeyPressed
+        // TODO add your handling code here:
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+            joinRoom();
+        }
+    }//GEN-LAST:event_txtRoomIDKeyPressed
 
     private boolean validateRoomID() {
         try {
